@@ -3,6 +3,7 @@ package ro.ubbcluj.map.repository;
 import ro.ubbcluj.map.domain.Entity;
 import ro.ubbcluj.map.domain.Utilizator;
 import ro.ubbcluj.map.domain.validators.Validator;
+import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,9 +18,9 @@ public class InMemoryRepository<ID, E extends Entity<ID>> implements Repository<
     }
 
     @Override
-    public E findOne(ID id){
+    public E findOne(ID id) throws RepositoryExceptions{
         if (id==null)
-            throw new IllegalArgumentException("id must be not null");
+            throw new RepositoryExceptions("id must be not null");
         return entities.get(id);
     }
 
@@ -29,9 +30,9 @@ public class InMemoryRepository<ID, E extends Entity<ID>> implements Repository<
     }
 
     @Override
-    public E save(E entity) {
+    public E save(E entity) throws RepositoryExceptions{
         if (entity==null)
-            throw new IllegalArgumentException("entity must be not null");
+            throw new RepositoryExceptions("entity must be not null");
         validator.validate(entity);
         if(entities.get(entity.getId()) != null) {
             return entity;
@@ -41,14 +42,12 @@ public class InMemoryRepository<ID, E extends Entity<ID>> implements Repository<
     }
 
     @Override
-    public E delete(ID id) {
-        if (id == null){
-            throw new IllegalArgumentException("entity must be not null");
+    public E delete(ID id) throws RepositoryExceptions{
+        E entity = findOne(id);
+        if (entity != null){
+            return entities.remove(id);
         }
-        if (entities.get(id) == null){
-            return null;
-        }
-        return entities.remove(id);
+        return null;
     }
 
     @Override

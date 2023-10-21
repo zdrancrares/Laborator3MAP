@@ -2,12 +2,13 @@ package ro.ubbcluj.map.repository;
 
 import ro.ubbcluj.map.domain.Utilizator;
 import ro.ubbcluj.map.domain.validators.Validator;
+import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 
 import java.util.List;
 
 public class UtilizatorFileRepository extends AbstractFileRepository<Long, Utilizator> {
 
-    public UtilizatorFileRepository(String fileName, Validator<Utilizator> validator) {
+    public UtilizatorFileRepository(String fileName, Validator<Utilizator> validator) throws RepositoryExceptions {
         super(fileName, validator);
     }
 

@@ -3,6 +3,7 @@ package ro.ubbcluj.map.repository;
 
 import ro.ubbcluj.map.domain.Entity;
 import ro.ubbcluj.map.domain.validators.Validator;
+import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 
 import java.io.*;
 
@@ -14,14 +15,14 @@ import java.util.List;
 public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends InMemoryRepository<ID,E> {
     String fileName;
 
-    public AbstractFileRepository(String fileName, Validator<E> validator) {
+    public AbstractFileRepository(String fileName, Validator<E> validator) throws RepositoryExceptions {
         super(validator);
         this.fileName = fileName;
         loadData();
 
     }
 
-    private void loadData() { //decorator pattern
+    private void loadData() throws RepositoryExceptions { //decorator pattern
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String newLine;
             while ((newLine = reader.readLine()) != null) {
@@ -63,7 +64,7 @@ public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends I
     protected abstract String createEntityAsString(E entity); //Template Method
 
     @Override
-    public E save(E entity) {
+    public E save(E entity) throws RepositoryExceptions{
         E result = super.save(entity);
         if (result == null)
             writeToFile(entity);

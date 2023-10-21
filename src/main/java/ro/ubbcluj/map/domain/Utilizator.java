@@ -88,6 +88,6 @@ public class Utilizator extends Entity<Long> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFirstName(), getLastName(), getFriends());
+        return Objects.hash(getFirstName(), getLastName(), getId());
     }
 }

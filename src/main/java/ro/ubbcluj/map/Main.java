@@ -6,6 +6,8 @@ import ro.ubbcluj.map.domain.Utilizator;
 import ro.ubbcluj.map.domain.validators.PrietenieValidator;
 import ro.ubbcluj.map.domain.validators.UtilizatorValidator;
 import ro.ubbcluj.map.domain.validators.Validator;
+import ro.ubbcluj.map.exceptions.RepositoryExceptions;
+import ro.ubbcluj.map.exceptions.ServiceExceptions;
 import ro.ubbcluj.map.presentation.ConsoleUI;
 import ro.ubbcluj.map.repository.InMemoryRepository;
 import ro.ubbcluj.map.service.FriendshipService;
@@ -13,35 +15,16 @@ import ro.ubbcluj.map.service.Service;
 import ro.ubbcluj.map.service.UserService;
 
 public class Main {
-    public static void main(String[] args) {
-/*
-        Utilizator u1=new Utilizator("u1FirstName", "u1LastName");
-        u1.setId(1l);
-        Utilizator u2=new Utilizator("u2FirstName", "u2LastName"); u2.setId(1l);
-        Utilizator u3=new Utilizator("u3FirstName", "u3LastName"); u3.setId(1l);
-        Utilizator u4=new Utilizator("u4FirstName", "u4LastName"); u4.setId(1l);
-        Utilizator u5=new Utilizator("u5FirstName", "u5LastName"); u5.setId(1l);
-        Utilizator u6=new Utilizator("u6FirstName", "u6LastName"); u6.setId(1l);
-        Utilizator u7=new Utilizator("u7FirstName", "u7LastName"); u7.setId(1l);
-
-        InMemoryRepository<Long, Utilizator> repo=new InMemoryRepository<>(new UtilizatorValidator());
-        repo.save(u1);
-        repo.save(u2);
-        repo.save(u3);
-        repo.save(u4);
-        repo.save(u5);
-        repo.save(u6);
-        repo.save(u7);
-
-        System.out.println("ok");
-
- */
+    public static void main(String[] args) throws RepositoryExceptions, ServiceExceptions {
         Validator<Utilizator> userValidator = new UtilizatorValidator();
         Validator<Prietenie> friendshipValidator = new PrietenieValidator();
+
         InMemoryRepository<Long, Utilizator> repoUser =  new InMemoryRepository<>(userValidator);
         InMemoryRepository<Tuple<Long,Long>, Prietenie> repoFriendship= new InMemoryRepository<>(friendshipValidator);
-        UserService userService = new UserService(repoUser);
+
+        UserService userService = new UserService(repoUser, repoFriendship);
         FriendshipService friendshipService = new FriendshipService(repoFriendship);
+
         ConsoleUI console = new ConsoleUI(userService, friendshipService);
         console.startConsole();
     }

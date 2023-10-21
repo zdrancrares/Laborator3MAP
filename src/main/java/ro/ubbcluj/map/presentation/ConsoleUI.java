@@ -3,9 +3,11 @@ package ro.ubbcluj.map.presentation;
 import ro.ubbcluj.map.domain.Prietenie;
 import ro.ubbcluj.map.domain.Tuple;
 import ro.ubbcluj.map.domain.Utilizator;
+import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 import ro.ubbcluj.map.service.FriendshipService;
 import ro.ubbcluj.map.service.UserService;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleUI {
@@ -28,9 +30,12 @@ public class ConsoleUI {
         System.out.println("5 - Add a friend to a user");
         System.out.println("6 - Remove a friend from a user");
         System.out.println("7 - Show all friends of a user");
+        System.out.println("8 - Show all friendships");
+        System.out.println("9 - Number of distinct communities");
+        System.out.println("10 - Most sociable community");
     }
 
-    private void addFriend(){
+    private void addFriend() throws RepositoryExceptions {
         System.out.print("User_1 ID: ");
         Long user1ID = scanner.nextLong();
         System.out.print("User_2 ID: ");
@@ -63,7 +68,7 @@ public class ConsoleUI {
         }
     }
 
-    private void showAllFriends(){
+    private void showAllFriends() throws RepositoryExceptions{
         System.out.print("Introduceti ID-ul utilizatorului pentru care doriti sa aflati prietenii: ");
         Long userID = scanner.nextLong();
         Utilizator user = userService.getEntity(userID);
@@ -74,6 +79,18 @@ public class ConsoleUI {
         Iterable<Utilizator> prieteni = user.getFriends();
         for (Utilizator p : prieteni) {
             System.out.println(p);
+        }
+    }
+
+    private void showAllFriendships(){
+        Iterable<Prietenie> friendships = friendshipService.getAll();
+        boolean found = false;
+        for (Prietenie p: friendships){
+            System.out.println(p);
+            found = true;
+        }
+        if (!found){
+            System.out.println("Nu exista nicio prietenie.");
         }
     }
 
@@ -121,7 +138,24 @@ public class ConsoleUI {
         }
     }
 
-    public void startConsole(){
+    private void noOfCommunities(){
+        System.out.println("Aceasta retea este formata din " + userService.noOfCommunities() + " comunitati");
+    }
+
+    private void mostSociableCommunity(){
+        List<Iterable<Utilizator>> communities = userService.mostSociableCommunity();
+        System.out.println("Cea mai sociabila comunitate este formata din: ");
+        int cnt = 1;
+        for (Iterable<Utilizator> community: communities) {
+            System.out.println("Comunitatea " + cnt);
+            for (Utilizator u : community) {
+                System.out.println(u);
+            }
+            cnt++;
+        }
+    }
+
+    public void startConsole() throws RepositoryExceptions{
         boolean run = true;
         ConsoleUI.printMenu();
         while (run){
@@ -160,6 +194,15 @@ public class ConsoleUI {
                     break;
                 case 7:
                     showAllFriends();
+                    break;
+                case 8:
+                    showAllFriendships();
+                    break;
+                case 9:
+                    noOfCommunities();
+                    break;
+                case 10:
+                    mostSociableCommunity();
                     break;
                 default:
                     System.out.println("Nu ati introdus o optiune valida");
