@@ -12,9 +12,6 @@ public class PrietenieValidator implements Validator<Prietenie>{
         if (entity.getUser1() == entity.getUser2()){
             errors += "Cei doi prieteni nu pot sa aibe acelasi ID.\n";
         }
-        //if (entity.getUser1().getId() == null || entity.getUser2().getId() == null){
-          //  errors += "Cel putin unul dintre utilizatori nu exista.\n";
-        //}
         if (!errors.isEmpty()){
             throw new ValidationException(errors);
         }

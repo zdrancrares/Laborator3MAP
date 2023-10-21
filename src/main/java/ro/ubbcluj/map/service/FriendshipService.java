@@ -28,8 +28,14 @@ public class FriendshipService implements Service<Tuple<Long,Long>, Prietenie>{
     }
 
     @Override
-    public Prietenie deleteEntity(Tuple<Long, Long> id) {
-        return friendshipRepo.delete(id);
+    public Prietenie deleteEntity(Tuple<Long, Long> id) throws ServiceExceptions {
+        Prietenie friendship = friendshipRepo.delete(id);
+        if (friendship != null){
+            friendship.getUser1().getFriends().remove(friendship.getUser2());
+            friendship.getUser2().getFriends().remove(friendship.getUser1());
+            return friendship;
+        }
+        throw new ServiceExceptions("Nu exista aceasta prietenie!");
     }
 
     @Override

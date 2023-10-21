@@ -51,14 +51,28 @@ public class ConsoleUI {
     }
 
     private void removeFriend(){
+        System.out.print("ID-ul utilizatorului pentru care doriti sa stergeti un prieten: ");
+        Long user1ID = scanner.nextLong();
+        System.out.print("ID-ul prietenului de sters: ");
+        Long user2ID = scanner.nextLong();
+        Tuple<Long, Long> prietenieID = new Tuple<>(user1ID, user2ID);
+        try{
+            friendshipService.deleteEntity(prietenieID);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
     private void showAllFriends(){
         System.out.print("Introduceti ID-ul utilizatorului pentru care doriti sa aflati prietenii: ");
         Long userID = scanner.nextLong();
         Utilizator user = userService.getEntity(userID);
+        if (user == null){
+            System.out.println("Utilizatorul nu exista");
+            return;
+        }
         Iterable<Utilizator> prieteni = user.getFriends();
-        for (Utilizator p: prieteni){
+        for (Utilizator p : prieteni) {
             System.out.println(p);
         }
     }
@@ -84,11 +98,11 @@ public class ConsoleUI {
     }
 
     private void deleteUser(){
-        System.out.println("ID-ul utilizatorului: ");
+        System.out.print("ID-ul utilizatorului: ");
         Long userID = scanner.nextLong();
         try{
             userService.deleteEntity(userID);
-            System.out.println("Utilizatorul a fost sters cu succes");
+            System.out.println("Utilizatorul a fost sters cu succes.");
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
@@ -121,11 +135,11 @@ public class ConsoleUI {
                     System.out.println("Nu ati introdus o optiune valida.");
                 }
             }
-
             switch (command){
                 case 0:
                     System.out.println("La revedere!");
-                    return;
+                    run = false;
+                    break;
                 case 1:
                     ConsoleUI.printMenu();
                     break;

@@ -3,6 +3,7 @@ package ro.ubbcluj.map.service;
 import ro.ubbcluj.map.domain.Prietenie;
 import ro.ubbcluj.map.domain.Tuple;
 import ro.ubbcluj.map.domain.Utilizator;
+import ro.ubbcluj.map.exceptions.ServiceExceptions;
 import ro.ubbcluj.map.repository.Repository;
 
 import java.util.List;
@@ -39,8 +40,15 @@ public class UserService implements Service<Long, Utilizator>{
 
 
     @Override
-    public Utilizator deleteEntity(Long id) {
-        return userRepo.delete(id);
+    public Utilizator deleteEntity(Long id) throws ServiceExceptions{
+        Utilizator userToDelete =  userRepo.delete(id);
+        if (userToDelete != null){
+            for(Utilizator f: userToDelete.getFriends()){
+                f.getFriends().remove(userToDelete);
+            }
+            return userToDelete;
+        }
+        throw new ServiceExceptions("Utilizatorul pe care doriti sa-l stergeti nu exista.");
     }
 
     @Override
