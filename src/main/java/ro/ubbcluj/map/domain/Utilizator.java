@@ -3,6 +3,7 @@ package ro.ubbcluj.map.domain;
 
 import ro.ubbcluj.map.domain.validators.ValidationException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,6 +15,7 @@ public class Utilizator extends Entity<Long> {
     public Utilizator(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
+        friends = new ArrayList<>();
     }
 
     public String getFirstName() {

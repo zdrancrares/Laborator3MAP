@@ -1,12 +1,20 @@
 package ro.ubbcluj.map;
 
+import ro.ubbcluj.map.domain.Prietenie;
+import ro.ubbcluj.map.domain.Tuple;
 import ro.ubbcluj.map.domain.Utilizator;
+import ro.ubbcluj.map.domain.validators.PrietenieValidator;
 import ro.ubbcluj.map.domain.validators.UtilizatorValidator;
+import ro.ubbcluj.map.domain.validators.Validator;
+import ro.ubbcluj.map.presentation.ConsoleUI;
 import ro.ubbcluj.map.repository.InMemoryRepository;
+import ro.ubbcluj.map.service.FriendshipService;
+import ro.ubbcluj.map.service.Service;
+import ro.ubbcluj.map.service.UserService;
 
 public class Main {
     public static void main(String[] args) {
-
+/*
         Utilizator u1=new Utilizator("u1FirstName", "u1LastName");
         u1.setId(1l);
         Utilizator u2=new Utilizator("u2FirstName", "u2LastName"); u2.setId(1l);
@@ -26,5 +34,15 @@ public class Main {
         repo.save(u7);
 
         System.out.println("ok");
+
+ */
+        Validator<Utilizator> userValidator = new UtilizatorValidator();
+        Validator<Prietenie> friendshipValidator = new PrietenieValidator();
+        InMemoryRepository<Long, Utilizator> repoUser =  new InMemoryRepository<>(userValidator);
+        InMemoryRepository<Tuple<Long,Long>, Prietenie> repoFriendship= new InMemoryRepository<>(friendshipValidator);
+        UserService userService = new UserService(repoUser);
+        FriendshipService friendshipService = new FriendshipService(repoFriendship);
+        ConsoleUI console = new ConsoleUI(userService, friendshipService);
+        console.startConsole();
     }
 }

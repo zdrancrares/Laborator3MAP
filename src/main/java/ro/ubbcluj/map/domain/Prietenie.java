@@ -6,8 +6,13 @@ import java.time.LocalDateTime;
 public class Prietenie extends Entity<Tuple<Long,Long>> {
 
     LocalDateTime date;
+    Utilizator user1;
+    Utilizator user2;
 
-    public Prietenie() {
+    public Prietenie(Utilizator user1, Utilizator user2) {
+        this.user1 = user1;
+        this.user2 = user2;
+        this.date = LocalDateTime.now();
     }
 
     /**
