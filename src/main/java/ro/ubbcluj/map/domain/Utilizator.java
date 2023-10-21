@@ -1,6 +1,7 @@
 package ro.ubbcluj.map.domain;
 
 
+import com.jogamp.common.util.Bitfield;
 import ro.ubbcluj.map.domain.validators.ValidationException;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.Objects;
 public class Utilizator extends Entity<Long> {
     private String firstName;
     private String lastName;
-    private List<Utilizator> friends;
+    private final ArrayList<Utilizator> friends;
 
     public Utilizator(String firstName, String lastName) {
         this.firstName = firstName;
@@ -49,7 +50,7 @@ public class Utilizator extends Entity<Long> {
     }
 
     public void removeFriend(Long id) throws ValidationException{
-        for (var friend: friends){
+        for (Utilizator friend: friends){
             if (friend.getId() == id){
                 friends.remove(friend);
                 return;
@@ -60,11 +61,19 @@ public class Utilizator extends Entity<Long> {
 
     @Override
     public String toString() {
-        return "Utilizator{" +
+        StringBuilder result = new StringBuilder("Utilizator{" +
                 "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", friends=" + friends +
-                '}';
+                ", friends: ");
+        for(Utilizator utilizator: friends) {
+            result.append(utilizator.firstName)
+                    .append(" ")
+                    .append(utilizator.getLastName())
+                    .append(",");
+        }
+        result = new StringBuilder(result.substring(0, result.length() - 1));
+        result.append("}");
+        return result.toString();
     }
 
     @Override

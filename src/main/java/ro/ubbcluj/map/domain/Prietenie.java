@@ -22,4 +22,20 @@ public class Prietenie extends Entity<Tuple<Long,Long>> {
     public LocalDateTime getDate() {
         return date;
     }
+
+    public Utilizator getUser1() {
+        return user1;
+    }
+
+    public void setUser1(Utilizator user1) {
+        this.user1 = user1;
+    }
+
+    public Utilizator getUser2() {
+        return user2;
+    }
+
+    public void setUser2(Utilizator user2) {
+        this.user2 = user2;
+    }
 }

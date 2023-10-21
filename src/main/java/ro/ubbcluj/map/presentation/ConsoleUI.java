@@ -31,18 +31,19 @@ public class ConsoleUI {
     }
 
     private void addFriend(){
-        System.out.print("User_1's ID: ");
+        System.out.print("User_1 ID: ");
         Long user1ID = scanner.nextLong();
-        System.out.print("User_2's ID: ");
+        System.out.print("User_2 ID: ");
         Long user2ID = scanner.nextLong();
         Utilizator user1 = userService.getEntity(user1ID);
         Utilizator user2 = userService.getEntity(user2ID);
         Prietenie prietenie = new Prietenie(user1, user2);
+        Tuple<Long, Long> prietenieID = new Tuple<>(user1ID, user2ID);
+        prietenie.setId(prietenieID);
         try {
             if (friendshipService.addEntity(prietenie)) {
                 System.out.println("Prietenia a fost formata cu succes.");
-                user1.addFriend(user2);
-                user2.addFriend(user1);
+                userService.addFriend(user1ID, user2ID);
             }
         }catch(Exception e){
             System.out.println(e.getMessage());
@@ -53,7 +54,13 @@ public class ConsoleUI {
     }
 
     private void showAllFriends(){
-
+        System.out.print("Introduceti ID-ul utilizatorului pentru care doriti sa aflati prietenii: ");
+        Long userID = scanner.nextLong();
+        Utilizator user = userService.getEntity(userID);
+        Iterable<Utilizator> prieteni = user.getFriends();
+        for (Utilizator p: prieteni){
+            System.out.println(p);
+        }
     }
 
     private Long generateID(){
@@ -62,9 +69,9 @@ public class ConsoleUI {
     }
 
     private void addUser(){
-        System.out.print("Enter the user's first name: ");
+        System.out.print("Prenume: ");
         String firstName = scanner.next();
-        System.out.print("Enter the user's last name: ");
+        System.out.print("Nume: ");
         String lastName = scanner.next();
         Utilizator user = new Utilizator(firstName, lastName);
         user.setId(generateID());
@@ -77,7 +84,7 @@ public class ConsoleUI {
     }
 
     private void deleteUser(){
-        System.out.println("Enter the user's ID: ");
+        System.out.println("ID-ul utilizatorului: ");
         Long userID = scanner.nextLong();
         try{
             userService.deleteEntity(userID);
@@ -91,6 +98,7 @@ public class ConsoleUI {
         Iterable<Utilizator> users = userService.getAll();
         boolean found = false;
         for (Utilizator u: users){
+            System.out.print(u.getId() + " - ");
             System.out.println(u);
             found = true;
         }
@@ -116,7 +124,7 @@ public class ConsoleUI {
 
             switch (command){
                 case 0:
-                    System.out.println("Goodbye!");
+                    System.out.println("La revedere!");
                     return;
                 case 1:
                     ConsoleUI.printMenu();

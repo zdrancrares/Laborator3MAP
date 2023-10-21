@@ -18,6 +18,7 @@ public class UserService implements Service<Long, Utilizator>{
         Utilizator user = userRepo.findOne(userID);
         Utilizator friend = userRepo.findOne(friendID);
         user.addFriend(friend);
+        friend.addFriend(user);
         List<Utilizator> friendList = user.getFriends();
         return friendList.contains(friend);
     }

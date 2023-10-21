@@ -1,12 +1,11 @@
 package ro.ubbcluj.map.service;
 
 import ro.ubbcluj.map.domain.Entity;
-import ro.ubbcluj.map.domain.Utilizator;
 
 public interface Service<ID, E extends Entity<ID>> {
-    boolean addEntity(E entity);
+    boolean addEntity(E entity) throws Exception;
 
-    E deleteEntity(ID id);
+    E deleteEntity(ID id) throws Exception;
 
     Iterable<E> getAll();
 }
