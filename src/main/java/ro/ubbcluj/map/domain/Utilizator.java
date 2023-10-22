@@ -39,6 +39,12 @@ public class Utilizator extends Entity<Long> {
         return friends;
     }
 
+    /**
+     * adds a friend in a user's friendlist
+     * @param friend: the friend to be added
+     * @throws ValidationException
+     *          if the friend is null, or they are already friends or the friends have the same id
+     */
     public void addFriend(Utilizator friend) throws ValidationException{
         if (friend == null){
             throw new ValidationException("Prietenul nu poate sa fie null.");
@@ -46,12 +52,15 @@ public class Utilizator extends Entity<Long> {
         if (friends.contains(friend)){
             throw new ValidationException("Sunt deja prieteni.");
         }
+        if (Objects.equals(this.getId(), friend.getId())){
+            throw new ValidationException("Cei doi prieteni au acelasi id.");
+        }
         friends.add(friend);
     }
 
     public void removeFriend(Long id) throws ValidationException{
         for (Utilizator friend: friends){
-            if (friend.getId() == id){
+            if (Objects.equals(friend.getId(), id)){
                 friends.remove(friend);
                 return;
             }

@@ -1,5 +1,9 @@
 package ro.ubbcluj.map.exceptions;
 
+/**
+ * Class for repository exceptions
+ */
+
 public class RepositoryExceptions extends Exception{
     private String message;
     public RepositoryExceptions(String message){

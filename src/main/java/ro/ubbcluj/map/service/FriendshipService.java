@@ -35,13 +35,13 @@ public class FriendshipService implements Service<Tuple<Long,Long>, Prietenie>{
         Tuple<Long, Long> newID = new Tuple<>(secondID, firstID);
         Prietenie friendship2 = friendshipRepo.delete(newID);
         if (friendship1 != null){
-            friendship1.getUser1().getFriends().remove(friendship1.getUser2());
-            friendship1.getUser2().getFriends().remove(friendship1.getUser1());
+            friendship1.getUser1().removeFriend(friendship1.getUser2().getId());
+            friendship1.getUser2().removeFriend(friendship1.getUser1().getId());
             return friendship1;
         }
         if (friendship2 != null){
-            friendship2.getUser1().getFriends().remove(friendship2.getUser2());
-            friendship2.getUser2().getFriends().remove(friendship2.getUser1());
+            friendship2.getUser1().removeFriend(friendship2.getUser2().getId());
+            friendship2.getUser2().removeFriend(friendship2.getUser1().getId());
             return friendship2;
         }
         throw new ServiceExceptions("Nu exista aceasta prietenie!");

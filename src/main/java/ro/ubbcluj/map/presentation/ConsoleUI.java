@@ -22,17 +22,17 @@ public class ConsoleUI {
         scanner = new Scanner(System.in);
     }
     private static void printMenu(){
-        System.out.println("0 - Exit");
-        System.out.println("1 - Show the menu again");
-        System.out.println("2 - Add a user");
-        System.out.println("3 - Remove a user");
-        System.out.println("4 - Show all users");
-        System.out.println("5 - Add a friend to a user");
-        System.out.println("6 - Remove a friend from a user");
-        System.out.println("7 - Show all friends of a user");
-        System.out.println("8 - Show all friendships");
-        System.out.println("9 - Number of distinct communities");
-        System.out.println("10 - Most sociable community");
+        System.out.println("0 - Iesire");
+        System.out.println("1 - Afiseaza meniul");
+        System.out.println("2 - Adauga un utilizator");
+        System.out.println("3 - Sterge un utilizator");
+        System.out.println("4 - Afiseaza toti utilizatorii");
+        System.out.println("5 - Adauga o prietenie");
+        System.out.println("6 - Sterge o prietenie");
+        System.out.println("7 - Afiseaza toti prietenii unui utilizator");
+        System.out.println("8 - Afiseaza toate prieteniile");
+        System.out.println("9 - Numarul de comunitati");
+        System.out.println("10 - Cea mai sociabila comunitate");
     }
 
     private void addFriend() throws RepositoryExceptions {

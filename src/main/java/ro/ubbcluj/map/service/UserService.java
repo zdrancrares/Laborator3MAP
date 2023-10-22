@@ -20,6 +20,16 @@ public class UserService implements Service<Long, Utilizator>{
         this.prietenieRepo = prietenieRepo;
     }
 
+    /**
+     * adds a friend to a certain user(it also adds it to the other user)
+     * @param userID: the first user in the friendship
+     * @param friendID: the second user in the friendship
+     * @return true: if the two users are friends
+     *         otherwise it returns false
+     * @throws RepositoryExceptions
+     *          if either one of the users doesn't exist
+     */
+
     public boolean addFriend(Long userID, Long friendID) throws RepositoryExceptions{
         Utilizator user = userRepo.findOne(userID);
         Utilizator friend = userRepo.findOne(friendID);
@@ -44,13 +54,19 @@ public class UserService implements Service<Long, Utilizator>{
                 Tuple<Long, Long> newID2 = new Tuple<>(id, f.getId());
                 prietenieRepo.delete(newID);
                 prietenieRepo.delete(newID2);
-                f.getFriends().remove(userToDelete);
+                f.removeFriend(userToDelete.getId());
             }
             return userToDelete;
         }
         throw new ServiceExceptions("Utilizatorul pe care doriti sa-l stergeti nu exista.");
     }
 
+    /**
+     * Depth First Search to find the users of a community
+     * @param user: the user we reached with searching
+     * @param set: the set of users so we won't visit them twice
+     * @return the users who form a community starting from 'user'
+     */
     public List<Utilizator> DFS(Utilizator user, Set<Utilizator> set){
         List<Utilizator> users = new ArrayList<>();
         users.add(user);
@@ -65,6 +81,10 @@ public class UserService implements Service<Long, Utilizator>{
         return users;
     }
 
+    /**
+     * function which calculates the total number of communities in our social network(using DFS for finding communities)
+     * @return the number of distinct communities in the network
+     */
     public int noOfCommunities(){
         Iterable<Utilizator> users = userRepo.findAll();
         Set<Utilizator> set = new HashSet<>();
@@ -78,6 +98,10 @@ public class UserService implements Service<Long, Utilizator>{
         return count;
     }
 
+    /**
+     * function which finds the most sociable community/communities in our network
+     * @return a list of iterable's with the most sociable communities
+     */
     public List<Iterable<Utilizator>> mostSociableCommunity(){
         List<Iterable<Utilizator>> result = new ArrayList<>();
         Iterable<Utilizator> users = userRepo.findAll();
@@ -105,6 +129,11 @@ public class UserService implements Service<Long, Utilizator>{
         return userRepo.findAll();
     }
 
+    /**
+     * function which finds an entity by its id
+     * @return the entity if there is an entity with this id
+     *          otherwise it returns null
+     */
     public Utilizator getEntity(Long id) throws RepositoryExceptions{
         return userRepo.findOne(id);
     }

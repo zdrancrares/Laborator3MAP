@@ -1,5 +1,9 @@
 package ro.ubbcluj.map.exceptions;
 
+/**
+ * Class for service exceptions
+ */
+
 public class ServiceExceptions extends Exception{
     private String message;
     public ServiceExceptions(String message){
