@@ -43,7 +43,7 @@ public class UserService implements Service<Long, Utilizator>{
     }
 
     /**
-     * generates an unique ID
+     * generates an unique ID using an incrementing static variable
      * @return an ID(Long)
      */
     private Long generateID(){
@@ -51,11 +51,24 @@ public class UserService implements Service<Long, Utilizator>{
         return usersID;
     }
 
-    @Override
-    public boolean addEntity(Utilizator entity) throws RepositoryExceptions {
+    /**
+     * creates an entity with firstName and lastName
+     * adds the entity if it's valid, and it isn't already saved
+     * @param firstName
+     *         the first name of the entity to be created and saved
+     * @param lastName
+     *          the last name of the entity to be saved
+     * @return true - if the entity is saved
+     *         otherwise returns false(id already exists)
+     * @throws RepositoryExceptions from Repository
+     *            if the entity is not valid
+     *
+     */
+
+    public boolean addEntity(String firstName, String lastName) throws RepositoryExceptions {
+        Utilizator entity = new Utilizator(firstName, lastName);
         entity.setId(generateID());
-        Utilizator user = userRepo.save(entity);
-        return user == null;
+        return userRepo.save(entity) == null;
     }
 
     @Override
@@ -121,15 +134,20 @@ public class UserService implements Service<Long, Utilizator>{
         Set<Utilizator> set = new HashSet<>();
 
         int max = -1;
+        int friendsCounter;
         for (Utilizator u: users){
+            friendsCounter = 0;
             if (!set.contains(u)){
                 List<Utilizator> aux = DFS(u, set);
-                if (aux.size() > max){
-                    max = aux.size();
+                for (Utilizator a: aux){
+                    friendsCounter += a.getFriends().size();
+                }
+                if (friendsCounter > max){
+                    max = friendsCounter;
                     result = new ArrayList<>();
                     result.add(aux);
                 }
-                else if (aux.size() == max){
+                else if (friendsCounter == max){
                     result.add(aux);
                 }
             }

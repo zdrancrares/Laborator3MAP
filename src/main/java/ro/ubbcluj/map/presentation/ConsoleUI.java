@@ -40,9 +40,8 @@ public class ConsoleUI {
         Long user2ID = scanner.nextLong();
         Utilizator user1 = userService.getEntity(user1ID);
         Utilizator user2 = userService.getEntity(user2ID);
-        Prietenie prietenie = new Prietenie(user1, user2);
         try {
-            if (friendshipService.addEntity(prietenie)) {
+            if (friendshipService.addEntity(user1, user2)) {
                 System.out.println("Prietenia a fost formata cu succes.");
                 userService.addFriend(user1ID, user2ID);
             }
@@ -95,9 +94,8 @@ public class ConsoleUI {
         String firstName = scanner.next();
         System.out.print("Nume: ");
         String lastName = scanner.next();
-        Utilizator user = new Utilizator(firstName, lastName);
         try {
-            userService.addEntity(user);
+            userService.addEntity(firstName, lastName);
             System.out.println("Utilizatorul a fost adaugat cu succes.");
         }catch(Exception e){
             System.out.println(e.getMessage());

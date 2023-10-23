@@ -21,7 +21,7 @@ public interface Service<ID, E extends Entity<ID>> {
      *
      */
 
-    boolean addEntity(E entity) throws RepositoryExceptions, ServiceExceptions;
+    //boolean addEntity(E entity) throws RepositoryExceptions, ServiceExceptions;
 
     /**
      *  removes the entity with the specified id

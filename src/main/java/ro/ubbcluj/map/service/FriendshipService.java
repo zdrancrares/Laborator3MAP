@@ -2,6 +2,7 @@ package ro.ubbcluj.map.service;
 
 import ro.ubbcluj.map.domain.Prietenie;
 import ro.ubbcluj.map.domain.Tuple;
+import ro.ubbcluj.map.domain.Utilizator;
 import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 import ro.ubbcluj.map.exceptions.ServiceExceptions;
 import ro.ubbcluj.map.repository.Repository;
@@ -13,16 +14,31 @@ public class FriendshipService implements Service<Tuple<Long,Long>, Prietenie>{
         this.friendshipRepo = friendshipRepo;
     }
 
-    @Override
-    public boolean addEntity(Prietenie entity) throws ServiceExceptions, RepositoryExceptions{
+
+    /**
+     * adds the friendship between the two given users if it's valid, and it isn't already saved
+     * creates the id based on the users' id's
+     * @param user1
+     *         the first user of the friendship
+     * @param user2
+     *          the second user of the friendship
+     * @return true - if the entity is saved
+     *         otherwise returns false(id already exists)
+     * @throws ServiceExceptions
+     *            if the friendship is not valid
+     *
+     */
+
+    public boolean addEntity(Utilizator user1, Utilizator user2) throws ServiceExceptions, RepositoryExceptions{
+        Prietenie entity = new Prietenie(user1, user2);
         Tuple<Long, Long> prietenieID = new Tuple<>(entity.getUser1().getId(), entity.getUser2().getId());
         entity.setId(prietenieID);
         Long id1 = entity.getId().getLeft();
         Long id2 = entity.getId().getRight();
         Tuple<Long, Long> newID = new Tuple<>(id2,id1);
-        Prietenie gasestePrietenie1 = friendshipRepo.findOne(entity.getId());
-        Prietenie gasestePrietenie2 = friendshipRepo.findOne(newID);
-        if (gasestePrietenie1 != null || gasestePrietenie2 != null){
+        Prietenie friendship1 = friendshipRepo.findOne(entity.getId());
+        Prietenie friendship2 = friendshipRepo.findOne(newID);
+        if (friendship1 != null || friendship2 != null){
             throw new ServiceExceptions("Prietenia exista deja");
         }
         Prietenie friendship = friendshipRepo.save(entity);
