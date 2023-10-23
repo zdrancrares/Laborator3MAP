@@ -15,7 +15,10 @@ import java.util.Set;
 public class UserService implements Service<Long, Utilizator>{
     private Repository<Long, Utilizator> userRepo;
     private Repository<Tuple<Long,Long>, Prietenie> prietenieRepo;
+
+    private static Long usersID;
     public UserService(Repository<Long, Utilizator> userRepo, Repository<Tuple<Long, Long>, Prietenie> prietenieRepo){
+        usersID = 0L;
         this.userRepo = userRepo;
         this.prietenieRepo = prietenieRepo;
     }
@@ -39,8 +42,18 @@ public class UserService implements Service<Long, Utilizator>{
         return friendList.contains(friend);
     }
 
+    /**
+     * generates an unique ID
+     * @return an ID(Long)
+     */
+    private Long generateID(){
+        usersID += 1;
+        return usersID;
+    }
+
     @Override
     public boolean addEntity(Utilizator entity) throws RepositoryExceptions {
+        entity.setId(generateID());
         Utilizator user = userRepo.save(entity);
         return user == null;
     }

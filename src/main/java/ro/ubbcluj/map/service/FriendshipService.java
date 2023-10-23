@@ -15,6 +15,8 @@ public class FriendshipService implements Service<Tuple<Long,Long>, Prietenie>{
 
     @Override
     public boolean addEntity(Prietenie entity) throws ServiceExceptions, RepositoryExceptions{
+        Tuple<Long, Long> prietenieID = new Tuple<>(entity.getUser1().getId(), entity.getUser2().getId());
+        entity.setId(prietenieID);
         Long id1 = entity.getId().getLeft();
         Long id2 = entity.getId().getRight();
         Tuple<Long, Long> newID = new Tuple<>(id2,id1);

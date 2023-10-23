@@ -12,11 +12,9 @@ import java.util.Scanner;
 
 public class ConsoleUI {
     private Scanner scanner;
-    private static Long usersID;
-    public UserService userService;
-    public FriendshipService friendshipService;
+    private UserService userService;
+    private FriendshipService friendshipService;
     public ConsoleUI(UserService userService, FriendshipService friendshipService){
-        usersID = 0L;
         this.userService = userService;
         this.friendshipService = friendshipService;
         scanner = new Scanner(System.in);
@@ -43,8 +41,6 @@ public class ConsoleUI {
         Utilizator user1 = userService.getEntity(user1ID);
         Utilizator user2 = userService.getEntity(user2ID);
         Prietenie prietenie = new Prietenie(user1, user2);
-        Tuple<Long, Long> prietenieID = new Tuple<>(user1ID, user2ID);
-        prietenie.setId(prietenieID);
         try {
             if (friendshipService.addEntity(prietenie)) {
                 System.out.println("Prietenia a fost formata cu succes.");
@@ -94,18 +90,12 @@ public class ConsoleUI {
         }
     }
 
-    private Long generateID(){
-        usersID += 1;
-        return usersID;
-    }
-
     private void addUser(){
         System.out.print("Prenume: ");
         String firstName = scanner.next();
         System.out.print("Nume: ");
         String lastName = scanner.next();
         Utilizator user = new Utilizator(firstName, lastName);
-        user.setId(generateID());
         try {
             userService.addEntity(user);
             System.out.println("Utilizatorul a fost adaugat cu succes.");
