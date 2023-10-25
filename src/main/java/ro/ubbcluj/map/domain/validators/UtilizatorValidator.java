@@ -10,11 +10,15 @@ import java.util.List;
 public class UtilizatorValidator implements Validator<Utilizator> {
     @Override
     public void validate(Utilizator entity) throws ValidationException {
-        validateFirstName(entity.getFirstName());
-        validateLastName(entity.getLastName());
+        String errors = "";
+        errors += validateFirstName(entity.getFirstName());
+        errors += validateLastName(entity.getLastName());
+        if (!errors.isEmpty()){
+            throw new ValidationException(errors);
+        }
     }
 
-    private static void validateFirstName(String firstName) throws ValidationException{
+    private static String validateFirstName(String firstName) throws ValidationException{
         String errors = "";
         if (firstName.isEmpty()){
             errors += "Lungimea prenumelui nu poate sa fie nula.\n";
@@ -22,12 +26,10 @@ public class UtilizatorValidator implements Validator<Utilizator> {
         if (firstName.length() > 50){
             errors += "Lungimea prenumelui nu poate sa depaseasca 50 de caractere.\n";
         }
-        if (!errors.isEmpty()){
-            throw new ValidationException(errors);
-        }
+        return errors;
     }
 
-    private static void validateLastName(String lastName) throws ValidationException{
+    private static String validateLastName(String lastName) throws ValidationException{
         String errors = "";
         if (lastName.isEmpty()){
             errors += "Lungimea numelui nu poate sa fie nula.\n";
@@ -35,9 +37,7 @@ public class UtilizatorValidator implements Validator<Utilizator> {
         if (lastName.length() > 50){
             errors += "Lungimea numelui nu poate sa depaseasca 50 de caractere.\n";
         }
-        if (!errors.isEmpty()){
-            throw new ValidationException(errors);
-        }
+        return errors;
     }
 }
 
