@@ -14,7 +14,6 @@ public class FriendshipService implements Service<Tuple<Long,Long>, Prietenie>{
         this.friendshipRepo = friendshipRepo;
     }
 
-
     /**
      * adds the friendship between the two given users if it's valid, and it isn't already saved
      * creates the id based on the users' id's

@@ -10,7 +10,7 @@ import ro.ubbcluj.map.exceptions.ServiceExceptions;
 
 public interface Service<ID, E extends Entity<ID>> {
 
-    /**
+    /*
      * adds the entity if it's valid, and it isn't already saved
      * @param entity
      *         entity must be not null

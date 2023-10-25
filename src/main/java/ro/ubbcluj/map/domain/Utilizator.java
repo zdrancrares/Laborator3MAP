@@ -58,6 +58,11 @@ public class Utilizator extends Entity<Long> {
         friends.add(friend);
     }
 
+    /**
+     * removes a friend from a user's friendList
+     * @param id: the id of the user to be removed
+     * @throws ValidationException if the 2 users are not friends
+     */
     public void removeFriend(Long id) throws ValidationException{
         for (Utilizator friend: friends){
             if (Objects.equals(friend.getId(), id)){

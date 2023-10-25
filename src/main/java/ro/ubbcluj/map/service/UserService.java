@@ -7,10 +7,7 @@ import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 import ro.ubbcluj.map.exceptions.ServiceExceptions;
 import ro.ubbcluj.map.repository.Repository;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class UserService implements Service<Long, Utilizator>{
     private Repository<Long, Utilizator> userRepo;
@@ -89,21 +86,30 @@ public class UserService implements Service<Long, Utilizator>{
 
     /**
      * Depth First Search to find the users of a community
-     * @param user: the user we reached with searching
+     * @param utilizator: the user we reached with searching
      * @param set: the set of users so we won't visit them twice
      * @return the users who form a community starting from 'user'
      */
-    public List<Utilizator> DFS(Utilizator user, Set<Utilizator> set){
+
+    public List<Utilizator> DFS(Utilizator utilizator, Set<Utilizator> set){
         List<Utilizator> users = new ArrayList<>();
-        users.add(user);
-        set.add(user);
-        for (Utilizator u: user.getFriends()){
-            if (!set.contains(u)){
-                List<Utilizator> list = DFS(u, set);
-                users.addAll(list);
-                DFS(u, set);
+        Stack<Utilizator> stack = new Stack<>();
+
+        stack.push(utilizator);
+        set.add(utilizator);
+
+        while (!stack.isEmpty()) {
+            Utilizator current = stack.pop();
+            users.add(current);
+
+            for (Utilizator u : current.getFriends()) {
+                if (!set.contains(u)) {
+                    stack.push(u);
+                    set.add(u);
+                }
             }
         }
+
         return users;
     }
 
@@ -115,10 +121,10 @@ public class UserService implements Service<Long, Utilizator>{
         Iterable<Utilizator> users = userRepo.findAll();
         Set<Utilizator> set = new HashSet<>();
         int count = 0;
-        for (Utilizator user: users){
-            if (!set.contains(user)){
+        for (Utilizator u: users){
+            if (!set.contains(u)){
                 count++;
-                DFS(user, set);
+                DFS(u, set);
             }
         }
         return count;
@@ -131,24 +137,24 @@ public class UserService implements Service<Long, Utilizator>{
     public List<Iterable<Utilizator>> mostSociableCommunity(){
         List<Iterable<Utilizator>> result = new ArrayList<>();
         Iterable<Utilizator> users = userRepo.findAll();
-        Set<Utilizator> set = new HashSet<>();
 
-        int max = -1;
+        Set<Utilizator> set = new HashSet<>();
+        int maxLength = -1;
         int friendsCounter;
         for (Utilizator u: users){
             friendsCounter = 0;
             if (!set.contains(u)){
-                List<Utilizator> aux = DFS(u, set);
-                for (Utilizator a: aux){
-                    friendsCounter += a.getFriends().size();
+                List<Utilizator> community = DFS(u, set);
+                for (Utilizator c: community){
+                    friendsCounter += c.getFriends().size();
                 }
-                if (friendsCounter > max){
-                    max = friendsCounter;
+                if (friendsCounter > maxLength){
+                    maxLength = friendsCounter;
                     result = new ArrayList<>();
-                    result.add(aux);
+                    result.add(community);
                 }
-                else if (friendsCounter == max){
-                    result.add(aux);
+                else if (friendsCounter == maxLength){
+                    result.add(community);
                 }
             }
         }

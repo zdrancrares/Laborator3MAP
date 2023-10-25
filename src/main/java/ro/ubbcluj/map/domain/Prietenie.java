@@ -28,6 +28,7 @@ public class Prietenie extends Entity<Tuple<Long,Long>> {
         return date;
     }
 
+    // Getters and Setters for Friendship's attributes
     public Utilizator getUser1() {
         return user1;
     }
