@@ -4,6 +4,8 @@ import ro.ubbcluj.map.domain.Entity;
 import ro.ubbcluj.map.domain.validators.ValidationException;
 import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 
+import java.util.Optional;
+
 /**
  * CRUD operations repository interface
  * @param <ID> - type E must have an attribute of type ID
@@ -21,7 +23,7 @@ public interface Repository<ID, E extends Entity<ID>> {
      * @throws IllegalArgumentException
      *                  if id is null.
      */
-    E findOne(ID id) throws RepositoryExceptions;
+    Optional<E> findOne(ID id) throws RepositoryExceptions;
 
     /**
      *
@@ -40,7 +42,7 @@ public interface Repository<ID, E extends Entity<ID>> {
      * @throws IllegalArgumentException
      *             if the given entity is null.     *
      */
-    E save(E entity) throws RepositoryExceptions;
+    Optional<E> save(E entity) throws RepositoryExceptions;
 
 
     /**
@@ -51,7 +53,7 @@ public interface Repository<ID, E extends Entity<ID>> {
      * @throws IllegalArgumentException
      *                   if the given id is null.
      */
-    E delete(ID id) throws RepositoryExceptions;
+    Optional<E> delete(ID id) throws RepositoryExceptions;
 
     /**
      *
@@ -64,7 +66,7 @@ public interface Repository<ID, E extends Entity<ID>> {
      * @throws ValidationException
      *             if the entity is not valid.
      */
-    E update(E entity);
+    Optional<E> update(E entity) throws RepositoryExceptions;
 
 }
 

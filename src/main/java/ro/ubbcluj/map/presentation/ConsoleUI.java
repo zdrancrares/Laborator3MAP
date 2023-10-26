@@ -8,7 +8,10 @@ import ro.ubbcluj.map.service.FriendshipService;
 import ro.ubbcluj.map.service.UserService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConsoleUI {
     private Scanner scanner;
@@ -38,15 +41,20 @@ public class ConsoleUI {
         Long user1ID = scanner.nextLong();
         System.out.print("User_2 ID: ");
         Long user2ID = scanner.nextLong();
-        Utilizator user1 = userService.getEntity(user1ID);
-        Utilizator user2 = userService.getEntity(user2ID);
-        try {
-            if (friendshipService.addEntity(user1, user2)) {
-                System.out.println("Prietenia a fost formata cu succes.");
-                userService.addFriend(user1ID, user2ID);
+        Optional<Utilizator> user1 = userService.getEntity(user1ID);
+        Optional<Utilizator> user2 = userService.getEntity(user2ID);
+        if (user1.isPresent() && user2.isPresent()) {
+            try {
+                if (friendshipService.addEntity(user1.get(), user2.get())) {
+                    System.out.println("Prietenia a fost formata cu succes.");
+                    userService.addFriend(user1ID, user2ID);
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
-        }catch(Exception e){
-            System.out.println(e.getMessage());
+        }
+        else{
+            System.out.println("Unul dintre utilizatori nu exista!");
         }
     }
 
@@ -66,12 +74,12 @@ public class ConsoleUI {
     private void showAllFriends() throws RepositoryExceptions{
         System.out.print("Introduceti ID-ul utilizatorului pentru care doriti sa aflati prietenii: ");
         Long userID = scanner.nextLong();
-        Utilizator user = userService.getEntity(userID);
-        if (user == null){
+        Optional<Utilizator> user = userService.getEntity(userID);
+        if (user.isEmpty()){
             System.out.println("Utilizatorul nu exista");
             return;
         }
-        Iterable<Utilizator> prieteni = user.getFriends();
+        Iterable<Utilizator> prieteni = user.get().getFriends();
         for (Utilizator p : prieteni) {
             System.out.println(p);
         }
@@ -79,12 +87,12 @@ public class ConsoleUI {
 
     private void showAllFriendships(){
         Iterable<Prietenie> friendships = friendshipService.getAll();
-        boolean found = false;
-        for (Prietenie p: friendships){
+        AtomicBoolean found = new AtomicBoolean(false);
+        friendships.forEach(p -> {
             System.out.println(p);
-            found = true;
-        }
-        if (!found){
+            found.set(true);
+        });
+        if (!found.get()){
             System.out.println("Nu exista nicio prietenie.");
         }
     }
@@ -115,13 +123,13 @@ public class ConsoleUI {
 
     private void showAllUsers(){
         Iterable<Utilizator> users = userService.getAll();
-        boolean found = false;
-        for (Utilizator u: users){
+        AtomicBoolean found = new AtomicBoolean(false);
+        users.forEach(u -> {
             System.out.print(u.getId() + " - ");
             System.out.println(u);
-            found = true;
-        }
-        if (!found){
+            found.set(true);
+        });
+        if (!found.get()){
             System.out.println("Nu exista niciun utilizator.");
         }
     }
@@ -133,14 +141,14 @@ public class ConsoleUI {
     private void mostSociableCommunity(){
         List<Iterable<Utilizator>> communities = userService.mostSociableCommunity();
         System.out.println("Cea mai sociabila comunitate este formata din: ");
-        int cnt = 1;
-        for (Iterable<Utilizator> community: communities) {
+        final AtomicInteger cnt = new AtomicInteger(1);
+        communities.forEach(community ->{
             System.out.println("Comunitatea " + cnt);
             for (Utilizator u : community) {
                 System.out.println(u);
             }
-            cnt++;
-        }
+            cnt.incrementAndGet();
+        });
     }
 
     public void startConsole() throws RepositoryExceptions{

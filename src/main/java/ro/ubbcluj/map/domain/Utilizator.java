@@ -1,12 +1,13 @@
 package ro.ubbcluj.map.domain;
 
 
-import com.jogamp.common.util.Bitfield;
 import ro.ubbcluj.map.domain.validators.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 public class Utilizator extends Entity<Long> {
     private String firstName;
@@ -64,13 +65,13 @@ public class Utilizator extends Entity<Long> {
      * @throws ValidationException if the 2 users are not friends
      */
     public void removeFriend(Long id) throws ValidationException{
-        for (Utilizator friend: friends){
-            if (Objects.equals(friend.getId(), id)){
-                friends.remove(friend);
-                return;
-            }
+        Predicate<Utilizator> friendIdMatch = friend -> Objects.equals(friend.getId(), id);
+
+        boolean result = friends.removeIf(friendIdMatch);
+
+        if (!result) {
+            throw new ValidationException("Nu sunt prieteni.");
         }
-        throw new ValidationException("Nu sunt prieteni.");
     }
 
     @Override
@@ -79,12 +80,15 @@ public class Utilizator extends Entity<Long> {
                 "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", friends: ");
-        for(Utilizator utilizator: friends) {
-            result.append(utilizator.firstName)
+
+        StringBuilder finalResult = result;
+        friends.forEach(utilizator->{
+            finalResult.append(utilizator.firstName)
                     .append(" ")
-                    .append(utilizator.getLastName())
+                    .append(utilizator.lastName)
                     .append(",");
-        }
+
+        });
         result = new StringBuilder(result.substring(0, result.length() - 1));
         result.append("}");
         return result.toString();

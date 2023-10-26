@@ -8,6 +8,8 @@ import ro.ubbcluj.map.exceptions.ServiceExceptions;
 import ro.ubbcluj.map.repository.Repository;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 public class UserService implements Service<Long, Utilizator>{
     private Repository<Long, Utilizator> userRepo;
@@ -22,21 +24,26 @@ public class UserService implements Service<Long, Utilizator>{
 
     /**
      * adds a friend to a certain user(it also adds it to the other user)
-     * @param userID: the first user in the friendship
+     *
+     * @param userID:   the first user in the friendship
      * @param friendID: the second user in the friendship
      * @return true: if the two users are friends
-     *         otherwise it returns false
-     * @throws RepositoryExceptions
-     *          if either one of the users doesn't exist
+     * otherwise it returns false
+     * @throws RepositoryExceptions if either one of the users doesn't exist
      */
 
-    public boolean addFriend(Long userID, Long friendID) throws RepositoryExceptions{
-        Utilizator user = userRepo.findOne(userID);
-        Utilizator friend = userRepo.findOne(friendID);
-        user.addFriend(friend);
-        friend.addFriend(user);
-        List<Utilizator> friendList = user.getFriends();
-        return friendList.contains(friend);
+    public Optional<Boolean> addFriend(Long userID, Long friendID) throws RepositoryExceptions{
+        Optional<Utilizator> user = userRepo.findOne(userID);
+        Optional<Utilizator> friend = userRepo.findOne(friendID);
+        Optional<Boolean> result = Optional.of(false);
+        Predicate<Optional<Utilizator>> isPresentTest = Optional::isPresent;
+        if (isPresentTest.test(user) && isPresentTest.test(friend)){
+            user.get().addFriend(friend.get());
+            friend.get().addFriend(user.get());
+            List<Utilizator> friendList = user.get().getFriends();
+            result = Optional.of(friendList.contains(friend.get()));
+        }
+        return result;
     }
 
     /**
@@ -65,21 +72,26 @@ public class UserService implements Service<Long, Utilizator>{
     public boolean addEntity(String firstName, String lastName) throws RepositoryExceptions {
         Utilizator entity = new Utilizator(firstName, lastName);
         entity.setId(generateID());
-        return userRepo.save(entity) == null;
+        return userRepo.save(entity).isEmpty();
     }
 
     @Override
     public Utilizator deleteEntity(Long id) throws ServiceExceptions, RepositoryExceptions {
-        Utilizator userToDelete =  userRepo.delete(id);
-        if (userToDelete != null){
-            for(Utilizator f: userToDelete.getFriends()){
-                Tuple<Long, Long> newID = new Tuple<>(f.getId(), id);
-                Tuple<Long, Long> newID2 = new Tuple<>(id, f.getId());
-                prietenieRepo.delete(newID);
-                prietenieRepo.delete(newID2);
-                f.removeFriend(userToDelete.getId());
-            }
-            return userToDelete;
+        Optional<Utilizator> userToDelete = userRepo.delete(id);
+
+        if (userToDelete.isPresent()) {
+            userToDelete.get().getFriends().forEach(friend -> {
+                try {
+                    Tuple<Long, Long> newID = new Tuple<>(friend.getId(), id);
+                    Tuple<Long, Long> newID2 = new Tuple<>(id, friend.getId());
+                    prietenieRepo.delete(newID);
+                    prietenieRepo.delete(newID2);
+                    friend.removeFriend(id);
+                } catch (RepositoryExceptions e) {
+                    System.out.println(e.getMessage());
+                }
+            });
+            return userToDelete.get();
         }
         throw new ServiceExceptions("Utilizatorul pe care doriti sa-l stergeti nu exista.");
     }
@@ -102,14 +114,13 @@ public class UserService implements Service<Long, Utilizator>{
             Utilizator current = stack.pop();
             users.add(current);
 
-            for (Utilizator u : current.getFriends()) {
-                if (!set.contains(u)) {
-                    stack.push(u);
-                    set.add(u);
-                }
-            }
+            current.getFriends().stream()
+                    .filter(u -> !set.contains(u))
+                    .forEach(u -> {
+                        stack.push(u);
+                        set.add(u);
+                    });
         }
-
         return users;
     }
 
@@ -118,16 +129,17 @@ public class UserService implements Service<Long, Utilizator>{
      * @return the number of distinct communities in the network
      */
     public int noOfCommunities(){
-        Iterable<Utilizator> users = userRepo.findAll();
         Set<Utilizator> set = new HashSet<>();
-        int count = 0;
-        for (Utilizator u: users){
-            if (!set.contains(u)){
-                count++;
+        AtomicInteger count = new AtomicInteger(0);
+
+        userRepo.findAll().forEach(u -> {
+            if (!set.contains(u)) {
+                count.incrementAndGet();
                 DFS(u, set);
             }
-        }
-        return count;
+        });
+
+        return count.get();
     }
 
     /**
@@ -135,29 +147,29 @@ public class UserService implements Service<Long, Utilizator>{
      * @return a list of iterable's with the most sociable communities
      */
     public List<Iterable<Utilizator>> mostSociableCommunity(){
-        List<Iterable<Utilizator>> result = new ArrayList<>();
+
         Iterable<Utilizator> users = userRepo.findAll();
 
         Set<Utilizator> set = new HashSet<>();
-        int maxLength = -1;
-        int friendsCounter;
-        for (Utilizator u: users){
-            friendsCounter = 0;
-            if (!set.contains(u)){
+        List<Iterable<Utilizator>> result = new ArrayList<>();
+        AtomicInteger maxLength = new AtomicInteger(-1);
+
+        users.forEach(u -> {
+            if (!set.contains(u)) {
                 List<Utilizator> community = DFS(u, set);
-                for (Utilizator c: community){
-                    friendsCounter += c.getFriends().size();
-                }
-                if (friendsCounter > maxLength){
-                    maxLength = friendsCounter;
-                    result = new ArrayList<>();
+                int friendsCounter = community.stream()
+                        .mapToInt(c -> c.getFriends().size())
+                        .sum();
+
+                if (friendsCounter > maxLength.get()) {
+                    maxLength.set(friendsCounter);
+                    result.clear();
                     result.add(community);
-                }
-                else if (friendsCounter == maxLength){
+                } else if (friendsCounter == maxLength.get()) {
                     result.add(community);
                 }
             }
-        }
+        });
         return result;
     }
 
@@ -171,7 +183,7 @@ public class UserService implements Service<Long, Utilizator>{
      * @return the entity if there is an entity with this id
      *          otherwise it returns null
      */
-    public Utilizator getEntity(Long id) throws RepositoryExceptions{
+    public Optional<Utilizator> getEntity(Long id) throws RepositoryExceptions{
         return userRepo.findOne(id);
     }
 

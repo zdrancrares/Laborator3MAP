@@ -7,6 +7,8 @@ import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 import ro.ubbcluj.map.exceptions.ServiceExceptions;
 import ro.ubbcluj.map.repository.Repository;
 
+import java.util.Optional;
+
 
 public class FriendshipService implements Service<Tuple<Long,Long>, Prietenie>{
     private Repository<Tuple<Long, Long>, Prietenie> friendshipRepo;
@@ -35,31 +37,31 @@ public class FriendshipService implements Service<Tuple<Long,Long>, Prietenie>{
         Long id1 = entity.getId().getLeft();
         Long id2 = entity.getId().getRight();
         Tuple<Long, Long> newID = new Tuple<>(id2,id1);
-        Prietenie friendship1 = friendshipRepo.findOne(entity.getId());
-        Prietenie friendship2 = friendshipRepo.findOne(newID);
-        if (friendship1 != null || friendship2 != null){
+        Optional<Prietenie> friendship1 = friendshipRepo.findOne(entity.getId());
+        Optional<Prietenie> friendship2 = friendshipRepo.findOne(newID);
+        if (friendship1.isPresent() || friendship2.isPresent()){
             throw new ServiceExceptions("Prietenia exista deja");
         }
-        Prietenie friendship = friendshipRepo.save(entity);
-        return friendship == null;
+        Optional<Prietenie> friendship = friendshipRepo.save(entity);
+        return friendship.isEmpty();
     }
 
     @Override
     public Prietenie deleteEntity(Tuple<Long, Long> id) throws ServiceExceptions, RepositoryExceptions {
-        Prietenie friendship1 = friendshipRepo.delete(id);
+        Optional<Prietenie> friendship1 = friendshipRepo.delete(id);
         Long firstID = id.getLeft();
         Long secondID = id.getRight();
         Tuple<Long, Long> newID = new Tuple<>(secondID, firstID);
-        Prietenie friendship2 = friendshipRepo.delete(newID);
-        if (friendship1 != null){
-            friendship1.getUser1().removeFriend(friendship1.getUser2().getId());
-            friendship1.getUser2().removeFriend(friendship1.getUser1().getId());
-            return friendship1;
+        Optional<Prietenie> friendship2 = friendshipRepo.delete(newID);
+        if (friendship1.isPresent()){
+            friendship1.get().getUser1().removeFriend(friendship1.get().getUser2().getId());
+            friendship1.get().getUser2().removeFriend(friendship1.get().getUser1().getId());
+            return friendship1.get();
         }
-        if (friendship2 != null){
-            friendship2.getUser1().removeFriend(friendship2.getUser2().getId());
-            friendship2.getUser2().removeFriend(friendship2.getUser1().getId());
-            return friendship2;
+        if (friendship2.isPresent()){
+            friendship2.get().getUser1().removeFriend(friendship2.get().getUser2().getId());
+            friendship2.get().getUser2().removeFriend(friendship2.get().getUser1().getId());
+            return friendship2.get();
         }
         throw new ServiceExceptions("Nu exista aceasta prietenie!");
     }

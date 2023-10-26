@@ -7,6 +7,9 @@ import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 public class InMemoryRepository<ID, E extends Entity<ID>> implements Repository<ID,E> {
     private Validator<E> validator;
@@ -18,10 +21,11 @@ public class InMemoryRepository<ID, E extends Entity<ID>> implements Repository<
     }
 
     @Override
-    public E findOne(ID id) throws RepositoryExceptions{
-        if (id==null)
+    public Optional<E> findOne(ID id) throws RepositoryExceptions{
+        Predicate<ID> isNull = Objects::isNull;
+        if (isNull.test(id))
             throw new RepositoryExceptions("id must be not null");
-        return entities.get(id);
+        return Optional.ofNullable(entities.get(id));
     }
 
     @Override
@@ -30,40 +34,40 @@ public class InMemoryRepository<ID, E extends Entity<ID>> implements Repository<
     }
 
     @Override
-    public E save(E entity) throws RepositoryExceptions{
-        if (entity==null)
+    public Optional<E> save(E entity) throws RepositoryExceptions{
+        Predicate<E> isNull = Objects::isNull;
+        if (isNull.test(entity))
             throw new RepositoryExceptions("entity must be not null");
         validator.validate(entity);
         if(entities.get(entity.getId()) != null) {
-            return entity;
+            return Optional.of(entity);
         }
-        else entities.put(entity.getId(),entity);
-        return null;
+        else entities.putIfAbsent(entity.getId(),entity);
+        return Optional.empty();
     }
 
     @Override
-    public E delete(ID id) throws RepositoryExceptions{
-        E entity = findOne(id);
-        if (entity != null){
-            return entities.remove(id);
+    public Optional<E> delete(ID id) throws RepositoryExceptions{
+        Optional<E> entity = findOne(id);
+        if (entity.isPresent()){
+            return Optional.ofNullable(entities.remove(id));
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public E update(E entity) {
-
-        if(entity == null)
-            throw new IllegalArgumentException("entity must be not null!");
+    public Optional<E> update(E entity) throws RepositoryExceptions{
+        Predicate<E> isNull = Objects::isNull;
+        if (isNull.test(entity))
+            throw new RepositoryExceptions("entity must be not null!");
         validator.validate(entity);
 
         entities.put(entity.getId(),entity);
 
         if(entities.get(entity.getId()) != null) {
             entities.put(entity.getId(),entity);
-            return null;
+            return Optional.empty();
         }
-        return entity;
-
+        return Optional.of(entity);
     }
 }

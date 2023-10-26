@@ -9,7 +9,7 @@ import java.io.*;
 
 import java.util.Arrays;
 import java.util.List;
-
+import java.util.Optional;
 
 
 public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends InMemoryRepository<ID,E> {
@@ -64,9 +64,9 @@ public abstract class AbstractFileRepository<ID, E extends Entity<ID>> extends I
     protected abstract String createEntityAsString(E entity); //Template Method
 
     @Override
-    public E save(E entity) throws RepositoryExceptions{
-        E result = super.save(entity);
-        if (result == null)
+    public Optional<E> save(E entity) throws RepositoryExceptions{
+        Optional<E> result = super.save(entity);
+        if (result.isEmpty())
             writeToFile(entity);
         return result;
 
