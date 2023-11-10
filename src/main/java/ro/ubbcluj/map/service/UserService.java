@@ -109,6 +109,11 @@ public class UserService implements Service<Long, Utilizator>{
         return user.<Iterable<Utilizator>>map(Utilizator::getFriends).orElse(null);
     }
 
+    public Iterable<Prietenie> loadUserFriendsMonth(Long id, int month) throws RepositoryExceptions{
+        Iterable<Prietenie> friendships = userRepo.loadFriendsMonth(id, month);
+        return friendships;
+    }
+
     /**
      * Depth First Search to find the users of a community
      * @param utilizator: the user we reached with searching
@@ -116,7 +121,7 @@ public class UserService implements Service<Long, Utilizator>{
      * @return the users who form a community starting from 'user'
      */
 
-    public List<Utilizator> DFS(Utilizator utilizator, Set<Utilizator> set){
+    public List<Utilizator> DFS(Utilizator utilizator, Set<Utilizator> set) throws RepositoryExceptions {
         List<Utilizator> users = new ArrayList<>();
         Stack<Utilizator> stack = new Stack<>();
 
@@ -127,12 +132,13 @@ public class UserService implements Service<Long, Utilizator>{
             Utilizator current = stack.pop();
             users.add(current);
 
-            current.getFriends().stream()
+            Optional<Utilizator> user = userRepo.loadFriends(current.getId());
+            user.ifPresent(value -> value.getFriends().stream()
                     .filter(u -> !set.contains(u))
                     .forEach(u -> {
                         stack.push(u);
                         set.add(u);
-                    });
+                    }));
         }
         return users;
     }
@@ -145,10 +151,16 @@ public class UserService implements Service<Long, Utilizator>{
         Set<Utilizator> set = new HashSet<>();
         AtomicInteger count = new AtomicInteger(0);
 
-        userRepo.findAll().forEach(u -> {
+        Iterable<Utilizator> users = userRepo.findAll();
+
+        users.forEach(u -> {
             if (!set.contains(u)) {
                 count.incrementAndGet();
-                DFS(u, set);
+                try {
+                    DFS(u, set);
+                } catch (RepositoryExceptions e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -169,10 +181,15 @@ public class UserService implements Service<Long, Utilizator>{
 
         users.forEach(u -> {
             if (!set.contains(u)) {
-                List<Utilizator> community = DFS(u, set);
-                int friendsCounter = community.stream()
-                        .mapToInt(c -> c.getFriends().size())
-                        .sum();
+                int beforeSize = set.size();
+                List<Utilizator> community = null;
+                try {
+                    community = DFS(u, set);
+                } catch (RepositoryExceptions e) {
+                    throw new RuntimeException(e);
+                }
+                int afterSize = set.size();
+                int friendsCounter = afterSize - beforeSize;
 
                 if (friendsCounter > maxLength.get()) {
                     maxLength.set(friendsCounter);

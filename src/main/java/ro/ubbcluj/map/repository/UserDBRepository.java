@@ -1,16 +1,17 @@
 package ro.ubbcluj.map.repository;
 
 import ro.ubbcluj.map.config.DatabaseConnectionConfig;
+import ro.ubbcluj.map.domain.Prietenie;
+import ro.ubbcluj.map.domain.Tuple;
 import ro.ubbcluj.map.domain.Utilizator;
 import ro.ubbcluj.map.domain.validators.Validator;
 import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class UserDBRepository implements Repository<Long, Utilizator> {
     private final Validator<Utilizator> validator;
@@ -155,12 +156,68 @@ public class UserDBRepository implements Repository<Long, Utilizator> {
                 String firstName = resultSet.getString("first_name");
                 String lastName = resultSet.getString("last_name");
                 Utilizator u = new Utilizator(firstName, lastName);
-                utilizator.setId(id);
+                u.setId(id);
                 utilizator.addFriend(u);
             }
         }catch(SQLException e){
             System.out.println(e.getMessage());
         }
         return Optional.of(utilizator);
+    }
+    @Override
+    public Iterable<Prietenie> loadFriendsMonth(Long idUser, int month) throws RepositoryExceptions{
+        Optional<Utilizator> user = findOne(idUser);
+        if (user.isEmpty()){
+            throw new RepositoryExceptions("Nu exista acest utilizator.");
+        }
+        ArrayList<Prietenie> result = new ArrayList<>();
+        Utilizator utilizator = user.get();
+        String sqlStatement = "select * from friendships F inner join users U1 on U1.id=F.userid1 inner join users U2 on U2.id=F.userid2 WHERE (U1.id=? OR U2.id=?)";
+        try(Connection connection = DriverManager.getConnection(DatabaseConnectionConfig.DB_URL,
+                DatabaseConnectionConfig.DB_USER, DatabaseConnectionConfig.DB_PASS);
+            PreparedStatement statement = connection.prepareStatement(sqlStatement)
+        ){
+            statement.setLong(1,idUser);
+            statement.setLong(2,idUser);
+            //statement.setInt(1, month);
+            ResultSet resultSet = statement.executeQuery();
+            while(resultSet.next()){
+                Utilizator u1 = new Utilizator(null, null);
+                u1.setId(resultSet.getLong(4));
+                u1.setFirstName(resultSet.getString(5));
+                u1.setLastName(resultSet.getString(6));
+
+                Utilizator u2 = new Utilizator(null, null);
+                u2.setId(resultSet.getLong(7));
+                u2.setFirstName(resultSet.getString(8));
+                u2.setLastName(resultSet.getString(9));
+
+                Tuple<Long,Long> id = new Tuple<>(resultSet.getLong(1),resultSet.getLong(2));
+                Prietenie p = new Prietenie(u1,u2);
+                p.setId(id);
+                p.setDate(resultSet.getTimestamp(3).toLocalDateTime());
+
+                result.add(p);
+                //String firstName = resultSet.getString("first_name");
+                //String lastName = resultSet.getString("last_name");
+                //Utilizator u = new Utilizator(firstName, lastName);
+                //u.setId(id);
+                //utilizator.addFriend(u);
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+
+        //Iterable<String> newResult = result.stream()
+          //      .filter(friendship -> friendship.getDate().getMonthValue() == month)
+            //    .map(friendship -> friendship.getUser1() + " | " + friendship.getUser2() + " | " + friendship.getDate())
+              //  .toList();
+
+        return result.stream()
+                .filter(u->u.getDate().getMonthValue() == month)
+                .toList();
+
+
+
     }
 }

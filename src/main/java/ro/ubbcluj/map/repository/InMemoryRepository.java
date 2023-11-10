@@ -1,14 +1,12 @@
 package ro.ubbcluj.map.repository;
 
 import ro.ubbcluj.map.domain.Entity;
+import ro.ubbcluj.map.domain.Prietenie;
 import ro.ubbcluj.map.domain.Utilizator;
 import ro.ubbcluj.map.domain.validators.Validator;
 import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class InMemoryRepository<ID, E extends Entity<ID>> implements Repository<ID,E> {
@@ -74,5 +72,10 @@ public class InMemoryRepository<ID, E extends Entity<ID>> implements Repository<
     @Override
     public Optional<Utilizator> loadFriends(ID idUser) throws RepositoryExceptions {
         return Optional.empty();
+    }
+
+    @Override
+    public Iterable<Prietenie> loadFriendsMonth(ID idUser, int month) throws RepositoryExceptions {
+        return null;
     }
 }

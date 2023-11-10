@@ -74,4 +74,8 @@ public class FriendshipService implements Service<Tuple<Long,Long>, Prietenie>{
     public Iterable<Prietenie> getAll() {
         return friendshipRepo.findAll();
     }
+
+    public Optional<Prietenie> getEntity(Tuple<Long,Long> id) throws RepositoryExceptions{
+        return friendshipRepo.findOne(id);
+    }
 }

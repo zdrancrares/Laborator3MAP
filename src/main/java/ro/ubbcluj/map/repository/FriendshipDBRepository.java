@@ -10,6 +10,7 @@ import ro.ubbcluj.map.service.FriendshipService;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -153,5 +154,10 @@ public class FriendshipDBRepository implements Repository<Tuple<Long,Long>, Prie
     @Override
     public Optional<Utilizator> loadFriends(Tuple<Long, Long> idUser) {
         return Optional.empty();
+    }
+
+    @Override
+    public Iterable<Prietenie> loadFriendsMonth(Tuple<Long, Long> idUser, int month) throws RepositoryExceptions {
+        return null;
     }
 }

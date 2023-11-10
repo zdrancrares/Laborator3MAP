@@ -7,9 +7,7 @@ import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 import ro.ubbcluj.map.service.FriendshipService;
 import ro.ubbcluj.map.service.UserService;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,9 +30,10 @@ public class ConsoleUI {
         System.out.println("6 - Adauga o prietenie");
         System.out.println("7 - Sterge o prietenie");
         System.out.println("8 - Afiseaza toti prietenii unui utilizator");
-        System.out.println("9 - Afiseaza toate prieteniile");
-        System.out.println("10 - Numarul de comunitati");
-        System.out.println("11 - Cea mai sociabila comunitate");
+        System.out.println("9 - Afiseaza toti prietenii unui utilizator care s-au creat intr-o anumita luna");
+        System.out.println("10 - Afiseaza toate prieteniile");
+        System.out.println("11 - Numarul de comunitati");
+        System.out.println("12 - Cea mai sociabila comunitate");
     }
 
     private void addFriend() throws RepositoryExceptions {
@@ -98,6 +97,32 @@ public class ConsoleUI {
         if (!found.get()){
             System.out.println("Nu exista nicio prietenie.");
         }
+    }
+
+    public void showAllFriendshipsMonth() throws RepositoryExceptions{
+        System.out.print("Introduceti id-ul utilizatorului: ");
+        Long id = scanner.nextLong();
+        System.out.print("Introduceti luna(numarul lunii): ");
+        int month = scanner.nextInt();
+        Optional<Utilizator> user = userService.getEntity(id);
+        if (user.isEmpty()){
+            System.out.println("Utilizatorul nu exista");
+            return;
+        }
+        Iterable<Prietenie> friendships = userService.loadUserFriendsMonth(id,month);
+        int sizeOfIterable = ((Collection<?>) friendships).size();
+        if (sizeOfIterable == 0){
+            System.out.println("Utilizatorul nu s-a imprietenit cu nimeni in aceasta luna.");
+            return;
+        }
+        friendships.forEach(f->{
+            if (Objects.equals(f.getUser1().getId(), id)){
+                System.out.println(f.getUser2().getFirstName() + " | " + f.getUser2().getLastName() + " | " + f.getDate());
+            }
+            else{
+                System.out.println(f.getUser1().getFirstName() + " | " + f.getUser1().getLastName() + " | " + f.getDate());
+            }
+        });
     }
 
     private void addUser(){
@@ -209,6 +234,7 @@ public class ConsoleUI {
                     break;
                 case 4:
                     updateUser();
+                    break;
                 case 5:
                     showAllUsers();
                     break;
@@ -222,12 +248,15 @@ public class ConsoleUI {
                     showAllFriends();
                     break;
                 case 9:
-                    showAllFriendships();
+                    showAllFriendshipsMonth();
                     break;
                 case 10:
-                    noOfCommunities();
+                    showAllFriendships();
                     break;
                 case 11:
+                    noOfCommunities();
+                    break;
+                case 12:
                     mostSociableCommunity();
                     break;
                 default:

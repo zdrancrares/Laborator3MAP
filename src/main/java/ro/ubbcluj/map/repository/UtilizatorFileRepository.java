@@ -1,10 +1,13 @@
 package ro.ubbcluj.map.repository;
 
+import ro.ubbcluj.map.domain.Prietenie;
 import ro.ubbcluj.map.domain.Utilizator;
 import ro.ubbcluj.map.domain.validators.Validator;
 import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class UtilizatorFileRepository extends AbstractFileRepository<Long, Utilizator> {
 
@@ -24,5 +27,10 @@ public class UtilizatorFileRepository extends AbstractFileRepository<Long, Utili
     @Override
     protected String createEntityAsString(Utilizator entity) {
         return entity.getId()+";"+entity.getFirstName()+";"+entity.getLastName();
+    }
+
+    @Override
+    public Iterable<Prietenie> loadFriendsMonth(Long idUser, int month) throws RepositoryExceptions {
+        return null;
     }
 }

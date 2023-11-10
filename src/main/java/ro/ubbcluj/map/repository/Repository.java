@@ -1,10 +1,12 @@
 package ro.ubbcluj.map.repository;
 
 import ro.ubbcluj.map.domain.Entity;
+import ro.ubbcluj.map.domain.Prietenie;
 import ro.ubbcluj.map.domain.Utilizator;
 import ro.ubbcluj.map.domain.validators.ValidationException;
 import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 /**
@@ -70,6 +72,8 @@ public interface Repository<ID, E extends Entity<ID>> {
     Optional<E> update(E entity) throws RepositoryExceptions;
 
     Optional<Utilizator> loadFriends(ID idUser) throws RepositoryExceptions;
+
+    Iterable<Prietenie>loadFriendsMonth(ID idUser, int month) throws RepositoryExceptions;
 
 }
 

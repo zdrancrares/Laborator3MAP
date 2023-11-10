@@ -34,10 +34,6 @@ public class Main {
         ConsoleUI console = new ConsoleUI(userService, friendshipService);
         console.startConsole();
 
-        //todo: loadFriends in userRepoDB - in principiu facuta
-        //todo: cand adaug o prietenie intotdeauna id-urile vor fi sortate crescator
-        //todo: friendshipRepoDB + de gatat la userRepoDB
-
         //Tuple<Long, Long> id = new Tuple<>(1L,2L);
         //System.out.println(repoFriendshipDB.findOne(id));
         //System.out.println(repoFriendshipDB.findAll());
@@ -45,5 +41,9 @@ public class Main {
         //Optional<Utilizator> u2 = repoUserDB.findOne(6L);
         //Prietenie tobeSaved = new Prietenie(u1.get(), u2.get());
         //System.out.println(repoFriendshipDB.save(tobeSaved));
+
+        //todo: stream-uri(filter,map,reduce etc) pentru a alege luna(nu din query)
+        //todo: de testat aplicatia
+        //todo: de implementat delete user
     }
 }
