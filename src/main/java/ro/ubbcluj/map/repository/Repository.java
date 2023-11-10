@@ -1,6 +1,7 @@
 package ro.ubbcluj.map.repository;
 
 import ro.ubbcluj.map.domain.Entity;
+import ro.ubbcluj.map.domain.Utilizator;
 import ro.ubbcluj.map.domain.validators.ValidationException;
 import ro.ubbcluj.map.exceptions.RepositoryExceptions;
 
@@ -67,6 +68,8 @@ public interface Repository<ID, E extends Entity<ID>> {
      *             if the entity is not valid.
      */
     Optional<E> update(E entity) throws RepositoryExceptions;
+
+    Optional<Utilizator> loadFriends(ID idUser) throws RepositoryExceptions;
 
 }
 

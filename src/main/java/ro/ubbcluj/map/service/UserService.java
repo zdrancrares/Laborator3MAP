@@ -35,8 +35,10 @@ public class UserService implements Service<Long, Utilizator>{
     public Optional<Boolean> addFriend(Long userID, Long friendID) throws RepositoryExceptions{
         Optional<Utilizator> user = userRepo.findOne(userID);
         Optional<Utilizator> friend = userRepo.findOne(friendID);
+
         Optional<Boolean> result = Optional.of(false);
         Predicate<Optional<Utilizator>> isPresentTest = Optional::isPresent;
+
         if (isPresentTest.test(user) && isPresentTest.test(friend)){
             user.get().addFriend(friend.get());
             friend.get().addFriend(user.get());
@@ -94,6 +96,17 @@ public class UserService implements Service<Long, Utilizator>{
             return userToDelete.get();
         }
         throw new ServiceExceptions("Utilizatorul pe care doriti sa-l stergeti nu exista.");
+    }
+
+    public boolean updateEntity(Long id, String firstName, String lastName) throws RepositoryExceptions{
+        Utilizator entity = new Utilizator(firstName, lastName);
+        entity.setId(id);
+        return userRepo.update(entity).isEmpty();
+    }
+
+    public Iterable<Utilizator> loadUserFriends(Long id) throws RepositoryExceptions{
+        Optional<Utilizator> user = userRepo.loadFriends(id);
+        return user.<Iterable<Utilizator>>map(Utilizator::getFriends).orElse(null);
     }
 
     /**

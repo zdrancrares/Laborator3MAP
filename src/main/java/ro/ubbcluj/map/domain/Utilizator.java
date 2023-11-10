@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 public class Utilizator extends Entity<Long> {
     private String firstName;
     private String lastName;
-    private final ArrayList<Utilizator> friends;
+    private ArrayList<Utilizator> friends;
 
     public Utilizator(String firstName, String lastName) {
         this.firstName = firstName;
@@ -38,6 +38,10 @@ public class Utilizator extends Entity<Long> {
 
     public List<Utilizator> getFriends() {
         return friends;
+    }
+
+    public void setFriends(ArrayList<Utilizator> friends){
+        this.friends = friends;
     }
 
     /**
@@ -76,22 +80,23 @@ public class Utilizator extends Entity<Long> {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder("Utilizator{" +
+        //StringBuilder result = new StringBuilder(
+        return "Utilizator{" +
                 "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", friends: ");
+                ", lastName='" + lastName + "}"; //+ '\'' +
+                //", friends: "
+        //);
 
-        StringBuilder finalResult = result;
-        friends.forEach(utilizator->{
-            finalResult.append(utilizator.firstName)
-                    .append(" ")
-                    .append(utilizator.lastName)
-                    .append(",");
-
-        });
-        result = new StringBuilder(result.substring(0, result.length() - 1));
-        result.append("}");
-        return result.toString();
+        //StringBuilder finalResult = result;
+        //friends.forEach(utilizator->{
+          //  finalResult.append(utilizator.firstName)
+            //        .append(" ")
+              //      .append(utilizator.lastName)
+                //    .append(",");
+        //});
+        //result = new StringBuilder(result.substring(0, result.length() - 1));
+        //result.append("}");
+        //return result.toString();
     }
 
     @Override

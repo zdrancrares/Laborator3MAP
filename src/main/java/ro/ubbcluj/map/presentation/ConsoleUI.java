@@ -27,13 +27,14 @@ public class ConsoleUI {
         System.out.println("1 - Afiseaza meniul");
         System.out.println("2 - Adauga un utilizator");
         System.out.println("3 - Sterge un utilizator");
-        System.out.println("4 - Afiseaza toti utilizatorii");
-        System.out.println("5 - Adauga o prietenie");
-        System.out.println("6 - Sterge o prietenie");
-        System.out.println("7 - Afiseaza toti prietenii unui utilizator");
-        System.out.println("8 - Afiseaza toate prieteniile");
-        System.out.println("9 - Numarul de comunitati");
-        System.out.println("10 - Cea mai sociabila comunitate");
+        System.out.println("4 - Modifica un utilizator");
+        System.out.println("5 - Afiseaza toti utilizatorii");
+        System.out.println("6 - Adauga o prietenie");
+        System.out.println("7 - Sterge o prietenie");
+        System.out.println("8 - Afiseaza toti prietenii unui utilizator");
+        System.out.println("9 - Afiseaza toate prieteniile");
+        System.out.println("10 - Numarul de comunitati");
+        System.out.println("11 - Cea mai sociabila comunitate");
     }
 
     private void addFriend() throws RepositoryExceptions {
@@ -79,10 +80,12 @@ public class ConsoleUI {
             System.out.println("Utilizatorul nu exista");
             return;
         }
-        Iterable<Utilizator> prieteni = user.get().getFriends();
-        for (Utilizator p : prieteni) {
-            System.out.println(p);
+        Iterable<Utilizator> friends = userService.loadUserFriends(userID);
+        if (friends == null){
+            System.out.println("Utilizatorul nu are niciun prieten");
+            return;
         }
+        friends.forEach(System.out::println);
     }
 
     private void showAllFriendships(){
@@ -103,8 +106,13 @@ public class ConsoleUI {
         System.out.print("Nume: ");
         String lastName = scanner.next();
         try {
-            userService.addEntity(firstName, lastName);
-            System.out.println("Utilizatorul a fost adaugat cu succes.");
+            boolean result = userService.addEntity(firstName, lastName);
+            if (result) {
+                System.out.println("Utilizatorul a fost adaugat cu succes.");
+            }
+            else{
+                System.out.println("Utilizatorul nu a fost adaugat.");
+            }
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
@@ -117,6 +125,26 @@ public class ConsoleUI {
             userService.deleteEntity(userID);
             System.out.println("Utilizatorul a fost sters cu succes.");
         }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void updateUser(){
+        System.out.print("ID-ul utilizatorului de modificat: ");
+        Long userID = scanner.nextLong();
+        System.out.print("Noul prenume pentru utilizator: ");
+        String firstName = scanner.next();
+        System.out.print("Noul nume pentru utilizator: ");
+        String lastName = scanner.next();
+        try{
+            boolean result = userService.updateEntity(userID, firstName, lastName);
+            if (result) {
+                System.out.println("Utilizatorul a fost modificat cu succes.");
+            }
+            else{
+                System.out.println("Utilizatorul nu a fost modificat.");
+            }
+        }catch (Exception e){
             System.out.println(e.getMessage());
         }
     }
@@ -180,24 +208,26 @@ public class ConsoleUI {
                     deleteUser();
                     break;
                 case 4:
+                    updateUser();
+                case 5:
                     showAllUsers();
                     break;
-                case 5:
+                case 6:
                     addFriend();
                     break;
-                case 6:
+                case 7:
                     removeFriend();
                     break;
-                case 7:
+                case 8:
                     showAllFriends();
                     break;
-                case 8:
+                case 9:
                     showAllFriendships();
                     break;
-                case 9:
+                case 10:
                     noOfCommunities();
                     break;
-                case 10:
+                case 11:
                     mostSociableCommunity();
                     break;
                 default:

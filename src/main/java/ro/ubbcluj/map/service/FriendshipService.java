@@ -31,19 +31,23 @@ public class FriendshipService implements Service<Tuple<Long,Long>, Prietenie>{
      */
 
     public boolean addEntity(Utilizator user1, Utilizator user2) throws ServiceExceptions, RepositoryExceptions{
-        Prietenie entity = new Prietenie(user1, user2);
-        Tuple<Long, Long> prietenieID = new Tuple<>(entity.getUser1().getId(), entity.getUser2().getId());
+        Prietenie entity;
+        Tuple<Long, Long> prietenieID;
+        if (user1.getId() < user2.getId()) {
+            entity = new Prietenie(user1, user2);
+            prietenieID = new Tuple<>(entity.getUser1().getId(), entity.getUser2().getId());
+        }
+        else{
+            entity = new Prietenie(user2, user1);
+            prietenieID = new Tuple<>(entity.getUser2().getId(), entity.getUser1().getId());
+        }
         entity.setId(prietenieID);
-        Long id1 = entity.getId().getLeft();
-        Long id2 = entity.getId().getRight();
-        Tuple<Long, Long> newID = new Tuple<>(id2,id1);
-        Optional<Prietenie> friendship1 = friendshipRepo.findOne(entity.getId());
-        Optional<Prietenie> friendship2 = friendshipRepo.findOne(newID);
-        if (friendship1.isPresent() || friendship2.isPresent()){
+        Optional<Prietenie> friendship = friendshipRepo.findOne(entity.getId());
+        if (friendship.isPresent()){
             throw new ServiceExceptions("Prietenia exista deja");
         }
-        Optional<Prietenie> friendship = friendshipRepo.save(entity);
-        return friendship.isEmpty();
+        Optional<Prietenie> p = friendshipRepo.save(entity);
+        return p.isEmpty();
     }
 
     @Override

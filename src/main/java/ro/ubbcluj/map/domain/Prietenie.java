@@ -27,6 +27,9 @@ public class Prietenie extends Entity<Tuple<Long,Long>> {
     public LocalDateTime getDate() {
         return date;
     }
+    public void setDate(LocalDateTime date){
+        this.date = date;
+    }
 
     // Getters and Setters for Friendship's attributes
     public Utilizator getUser1() {
