@@ -138,7 +138,29 @@ public class FriendshipDBRepository implements Repository<Tuple<Long,Long>, Prie
     }
 
     @Override
-    public Optional<Prietenie> delete(Tuple<Long, Long> longLongTuple) throws RepositoryExceptions {
+    public Optional<Prietenie> delete(Tuple<Long, Long> id) throws RepositoryExceptions {
+        String deleteSqlStatement = "delete from friendships where userid1=? and userid2=?";
+        try(Connection connection = DriverManager.getConnection(DatabaseConnectionConfig.DB_URL,
+                DatabaseConnectionConfig.DB_USER, DatabaseConnectionConfig.DB_PASS);
+            PreparedStatement statement = connection.prepareStatement(deleteSqlStatement);
+        ){
+            statement.setLong(1,id.getLeft());
+            statement.setLong(2,id.getRight());
+            Optional<Prietenie> toBeDeleted = findOne(id);
+            if (toBeDeleted.isPresent()){
+                Prietenie prietenie = toBeDeleted.get();
+                if (statement.executeUpdate() > 0){
+                    Tuple<Long, Long> newID = new Tuple<>(-1L, -1L);
+                    prietenie.setId(newID);
+                    return Optional.of(prietenie);
+                }
+                else{
+                    System.out.println("Delete failed");
+                }
+            }
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+        }
         return Optional.empty();
     }
 

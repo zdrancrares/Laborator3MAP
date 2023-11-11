@@ -80,19 +80,7 @@ public class UserService implements Service<Long, Utilizator>{
     @Override
     public Utilizator deleteEntity(Long id) throws ServiceExceptions, RepositoryExceptions {
         Optional<Utilizator> userToDelete = userRepo.delete(id);
-
-        if (userToDelete.isPresent()) {
-            userToDelete.get().getFriends().forEach(friend -> {
-                try {
-                    Tuple<Long, Long> newID = new Tuple<>(friend.getId(), id);
-                    Tuple<Long, Long> newID2 = new Tuple<>(id, friend.getId());
-                    prietenieRepo.delete(newID);
-                    prietenieRepo.delete(newID2);
-                    friend.removeFriend(id);
-                } catch (RepositoryExceptions e) {
-                    System.out.println(e.getMessage());
-                }
-            });
+        if (userToDelete.isPresent()){
             return userToDelete.get();
         }
         throw new ServiceExceptions("Utilizatorul pe care doriti sa-l stergeti nu exista.");
@@ -147,7 +135,7 @@ public class UserService implements Service<Long, Utilizator>{
         while (!stack.isEmpty()) {
             Utilizator current = stack.pop();
             users.add(current);
-            
+
             Optional<Utilizator> user = userRepo.findOne(current.getId());
             user.ifPresent(value -> value.getFriends().stream()
                     .filter(u -> !set.contains(u))

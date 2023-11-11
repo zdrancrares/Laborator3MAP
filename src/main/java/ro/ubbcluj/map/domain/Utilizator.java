@@ -80,23 +80,9 @@ public class Utilizator extends Entity<Long> {
 
     @Override
     public String toString() {
-        //StringBuilder result = new StringBuilder(
         return "Utilizator{" +
                 "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + "}"; //+ '\'' +
-                //", friends: "
-        //);
-
-        //StringBuilder finalResult = result;
-        //friends.forEach(utilizator->{
-          //  finalResult.append(utilizator.firstName)
-            //        .append(" ")
-              //      .append(utilizator.lastName)
-                //    .append(",");
-        //});
-        //result = new StringBuilder(result.substring(0, result.length() - 1));
-        //result.append("}");
-        //return result.toString();
+                ", lastName='" + lastName + "'}";
     }
 
     @Override

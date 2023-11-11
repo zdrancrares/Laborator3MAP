@@ -125,6 +125,26 @@ public class UserDBRepository implements Repository<Long, Utilizator> {
 
     @Override
     public Optional<Utilizator> delete(Long aLong) throws RepositoryExceptions {
+        String deleteSqlStatement = "delete from users where id=?";
+        try(Connection connection = DriverManager.getConnection(DatabaseConnectionConfig.DB_URL,
+                DatabaseConnectionConfig.DB_USER, DatabaseConnectionConfig.DB_PASS);
+            PreparedStatement statement = connection.prepareStatement(deleteSqlStatement);
+        ){
+            statement.setLong(1,aLong);
+            Optional<Utilizator> toBeDeleted = findOne(aLong);
+            if (toBeDeleted.isPresent()) {
+                Utilizator user = toBeDeleted.get();
+                if (statement.executeUpdate() > 0){
+                    user.setId(-1L);
+                    return Optional.of(user);
+                }
+                else{
+                    System.out.println("Delete failed");
+                }
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
         return Optional.empty();
     }
 

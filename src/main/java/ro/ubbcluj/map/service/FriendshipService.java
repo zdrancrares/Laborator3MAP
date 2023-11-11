@@ -52,20 +52,19 @@ public class FriendshipService implements Service<Tuple<Long,Long>, Prietenie>{
 
     @Override
     public Prietenie deleteEntity(Tuple<Long, Long> id) throws ServiceExceptions, RepositoryExceptions {
-        Optional<Prietenie> friendship1 = friendshipRepo.delete(id);
-        Long firstID = id.getLeft();
-        Long secondID = id.getRight();
-        Tuple<Long, Long> newID = new Tuple<>(secondID, firstID);
-        Optional<Prietenie> friendship2 = friendshipRepo.delete(newID);
-        if (friendship1.isPresent()){
-            friendship1.get().getUser1().removeFriend(friendship1.get().getUser2().getId());
-            friendship1.get().getUser2().removeFriend(friendship1.get().getUser1().getId());
-            return friendship1.get();
+        Long id1 = id.getLeft();
+        Long id2 = id.getRight();
+
+        if (id1 > id2){
+            Long aux = id1;
+            id1 = id2;
+            id2 = aux;
         }
-        if (friendship2.isPresent()){
-            friendship2.get().getUser1().removeFriend(friendship2.get().getUser2().getId());
-            friendship2.get().getUser2().removeFriend(friendship2.get().getUser1().getId());
-            return friendship2.get();
+
+        Tuple<Long, Long> newID = new Tuple<>(id1, id2);
+        Optional<Prietenie> friendship = friendshipRepo.delete(newID);
+        if (friendship.isPresent()){
+            return friendship.get();
         }
         throw new ServiceExceptions("Nu exista aceasta prietenie!");
     }

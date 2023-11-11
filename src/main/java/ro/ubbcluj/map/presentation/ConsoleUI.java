@@ -47,7 +47,9 @@ public class ConsoleUI {
             try {
                 if (friendshipService.addEntity(user1.get(), user2.get())) {
                     System.out.println("Prietenia a fost formata cu succes.");
-                    userService.addFriend(user1ID, user2ID);
+                }
+                else{
+                    System.out.println("Exista deja aceasta prietenie.");
                 }
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -66,6 +68,7 @@ public class ConsoleUI {
         Tuple<Long, Long> prietenieID = new Tuple<>(user1ID, user2ID);
         try{
             friendshipService.deleteEntity(prietenieID);
+            System.out.println("Prietenia a fost stearsa cu succes.");
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -80,13 +83,11 @@ public class ConsoleUI {
             return;
         }
 
-        //Iterable<Utilizator> friends = userService.loadUserFriends(userID);
         if (user.get().getFriends() == null){
             System.out.println("Utilizatorul nu are niciun prieten");
             return;
         }
         user.get().getFriends().forEach(System.out::println);
-        //friends.forEach(System.out::println);
     }
 
     private void showAllFriendships(){
