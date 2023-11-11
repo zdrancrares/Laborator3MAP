@@ -28,9 +28,4 @@ public class UtilizatorFileRepository extends AbstractFileRepository<Long, Utili
     protected String createEntityAsString(Utilizator entity) {
         return entity.getId()+";"+entity.getFirstName()+";"+entity.getLastName();
     }
-
-    @Override
-    public Iterable<Prietenie> loadFriendsMonth(Long idUser, int month) throws RepositoryExceptions {
-        return null;
-    }
 }

@@ -68,14 +68,4 @@ public class InMemoryRepository<ID, E extends Entity<ID>> implements Repository<
         }
         return Optional.of(entity);
     }
-
-    @Override
-    public Optional<Utilizator> loadFriends(ID idUser) throws RepositoryExceptions {
-        return Optional.empty();
-    }
-
-    @Override
-    public Iterable<Prietenie> loadFriendsMonth(ID idUser, int month) throws RepositoryExceptions {
-        return null;
-    }
 }

@@ -150,14 +150,4 @@ public class FriendshipDBRepository implements Repository<Tuple<Long,Long>, Prie
         }
         return Optional.empty();
     }
-
-    @Override
-    public Optional<Utilizator> loadFriends(Tuple<Long, Long> idUser) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Iterable<Prietenie> loadFriendsMonth(Tuple<Long, Long> idUser, int month) throws RepositoryExceptions {
-        return null;
-    }
 }

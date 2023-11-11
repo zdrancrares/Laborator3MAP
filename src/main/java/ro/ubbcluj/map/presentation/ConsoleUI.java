@@ -79,12 +79,14 @@ public class ConsoleUI {
             System.out.println("Utilizatorul nu exista");
             return;
         }
-        Iterable<Utilizator> friends = userService.loadUserFriends(userID);
-        if (friends == null){
+
+        //Iterable<Utilizator> friends = userService.loadUserFriends(userID);
+        if (user.get().getFriends() == null){
             System.out.println("Utilizatorul nu are niciun prieten");
             return;
         }
-        friends.forEach(System.out::println);
+        user.get().getFriends().forEach(System.out::println);
+        //friends.forEach(System.out::println);
     }
 
     private void showAllFriendships(){
@@ -109,20 +111,13 @@ public class ConsoleUI {
             System.out.println("Utilizatorul nu exista");
             return;
         }
-        Iterable<Prietenie> friendships = userService.loadUserFriendsMonth(id,month);
+        Iterable<String> friendships = userService.loadUserFriendsMonth(id,month);
         int sizeOfIterable = ((Collection<?>) friendships).size();
         if (sizeOfIterable == 0){
             System.out.println("Utilizatorul nu s-a imprietenit cu nimeni in aceasta luna.");
             return;
         }
-        friendships.forEach(f->{
-            if (Objects.equals(f.getUser1().getId(), id)){
-                System.out.println(f.getUser2().getFirstName() + " | " + f.getUser2().getLastName() + " | " + f.getDate());
-            }
-            else{
-                System.out.println(f.getUser1().getFirstName() + " | " + f.getUser1().getLastName() + " | " + f.getDate());
-            }
-        });
+        friendships.forEach(System.out::println);
     }
 
     private void addUser(){

@@ -11,7 +11,7 @@ public class Prietenie extends Entity<Tuple<Long,Long>> {
     private Utilizator user1;
     private Utilizator user2;
 
-    private String pattern = "yyyy-MM-dd HH:mm:ss";
+    private String pattern = "yyyy-MM-dd HH:mm";
 
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
 

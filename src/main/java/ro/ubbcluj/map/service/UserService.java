@@ -104,14 +104,30 @@ public class UserService implements Service<Long, Utilizator>{
         return userRepo.update(entity).isEmpty();
     }
 
-    public Iterable<Utilizator> loadUserFriends(Long id) throws RepositoryExceptions{
-        Optional<Utilizator> user = userRepo.loadFriends(id);
-        return user.<Iterable<Utilizator>>map(Utilizator::getFriends).orElse(null);
-    }
-
-    public Iterable<Prietenie> loadUserFriendsMonth(Long id, int month) throws RepositoryExceptions{
-        Iterable<Prietenie> friendships = userRepo.loadFriendsMonth(id, month);
-        return friendships;
+    public Iterable<String> loadUserFriendsMonth(Long id, int month) throws RepositoryExceptions{
+        ArrayList<Prietenie> prietenii = new ArrayList<>();
+        Optional<Utilizator> user = userRepo.findOne(id);
+        if (user.isPresent()){
+            for (Utilizator f: user.get().getFriends()){
+                Tuple<Long, Long> idPereche = new Tuple<>(null, null);
+                if (f.getId() < user.get().getId()){
+                    idPereche.setLeft(f.getId());
+                    idPereche.setRight(user.get().getId());
+                }
+                else{
+                    idPereche.setRight(f.getId());
+                    idPereche.setLeft(user.get().getId());
+                }
+                Optional<Prietenie> p = prietenieRepo.findOne(idPereche);
+                p.ifPresent(prietenii::add);
+            }
+        }
+        return prietenii.stream()
+              .filter(friendship -> friendship.getDate().getMonthValue() == month)
+            .map(friendship -> Objects.equals(friendship.getUser1().getId(), user.get().getId()) ?
+                    friendship.getUser2().getFirstName() + " | " + friendship.getUser2().getLastName() + " | " + friendship.getDate():
+                    friendship.getUser1().getFirstName() + " | " + friendship.getUser1().getLastName() + " | " + friendship.getDate())
+          .toList();
     }
 
     /**
@@ -131,8 +147,8 @@ public class UserService implements Service<Long, Utilizator>{
         while (!stack.isEmpty()) {
             Utilizator current = stack.pop();
             users.add(current);
-
-            Optional<Utilizator> user = userRepo.loadFriends(current.getId());
+            
+            Optional<Utilizator> user = userRepo.findOne(current.getId());
             user.ifPresent(value -> value.getFriends().stream()
                     .filter(u -> !set.contains(u))
                     .forEach(u -> {

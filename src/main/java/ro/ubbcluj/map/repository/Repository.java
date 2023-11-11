@@ -71,10 +71,6 @@ public interface Repository<ID, E extends Entity<ID>> {
      */
     Optional<E> update(E entity) throws RepositoryExceptions;
 
-    Optional<Utilizator> loadFriends(ID idUser) throws RepositoryExceptions;
-
-    Iterable<Prietenie>loadFriendsMonth(ID idUser, int month) throws RepositoryExceptions;
-
 }
 
 
